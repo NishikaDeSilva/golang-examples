@@ -1,3 +1,6 @@
+variables:
+  SUPER_LINTER_VERSION: v3.13.1
+
 trigger:
   branches:
     include:
@@ -14,6 +17,17 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- script: |
+    docker pull github/super-linter:$(SUPER_LINTER_VERSION)
+    docker run -e RUN_LOCAL=true -e VALIDATE_MD=true -e VALIDATE_YAML=true \
+    -e VALIDATE_XML=true -e VALIDATE_BASH=true \
+    -e VALIDATE_DOCKER=true -e VALIDATE_JAVASCRIPT_ES=true \
+    -e VALIDATE_TYPESCRIPT_ES=true -e VALIDATE_JSX=true -e VALIDATE_TSX=true \
+    -e VALIDATE_CSS=true -e VALIDATE_ENV=true -e VALIDATE_HTML=true \
+    -e VALIDATE_OPENAPI=true -e VALIDATE_PROTOBUF=true -e VALIDATE_GO=true \
+    -e VALIDATE_EDITORCONFIG=true -e VALIDATE_POWERSHELL=true \
+    -v $(System.DefaultWorkingDirectory):/tmp/lint github/super-linter:$(SUPER_LINTER_VERSION)
+  displayName: 'Code Scan using GitHub Super-Linter'
 - script: |
     docker run -v $(System.DefaultWorkingDirectory):/tmp/lint -w /tmp/lint \
     --entrypoint golangci-lint github/super-linter run -c sectest/.golangci.yml --timeout 2m
