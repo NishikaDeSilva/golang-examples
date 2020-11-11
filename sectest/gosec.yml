@@ -1,0 +1,33 @@
+trigger:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - master
+
+pr:
+  branches:
+    include:
+    - '*'
+
+variables:
+  GOBIN:  '$(GOPATH)/bin' # Go binaries path
+  GOROOT: '/usr/local/go1.15' # Go installation path
+  GOPATH: '$(system.defaultWorkingDirectory)/gopath' # Go workspace path
+  modulePath: '$(GOPATH)/src/github.com/$(build.repository.name)' # Path to the module's code
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- task: GoTool@0
+  inputs:
+    version: '1.15'
+  displayName: 'Use GO 1.15'
+
+- checkout: self
+
+- script: |
+    curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v2.4.0
+    $(GOBIN)/gosec ./...
+  displayName: 'Run GoSec security Scanner'

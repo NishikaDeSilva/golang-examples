@@ -1,0 +1,20 @@
+trigger:
+  branches:
+    include:
+    - '*'
+    exclude:
+    - master
+
+pr:
+  branches:
+    include:
+    - '*'
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+- script: |
+    docker run -v $(System.DefaultWorkingDirectory):/tmp/lint -w /tmp/lint \
+    --entrypoint golangci-lint github/super-linter run -c sectest/.golangci.yml --timeout 2m
+  displayName: 'Code Scan using golangci-lint'
