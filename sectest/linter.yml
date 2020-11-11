@@ -28,6 +28,7 @@ steps:
     -e VALIDATE_EDITORCONFIG=true -e VALIDATE_POWERSHELL=true \
     -v $(System.DefaultWorkingDirectory):/tmp/lint github/super-linter:$(SUPER_LINTER_VERSION)
   displayName: 'Code Scan using GitHub Super-Linter'
+  continueOnError: true
 - script: |
     docker run -v $(System.DefaultWorkingDirectory):/tmp/lint -w /tmp/lint \
     --entrypoint golangci-lint github/super-linter run -c sectest/.golangci.yml --timeout 2m
